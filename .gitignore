@@ -1,0 +1,9 @@
+# Arc runtime state, written into whatever project Arc is used in.
+.arc/
+
+# Planning and interview artifacts for Arc's own development.
+.omc/
+
+node_modules/
+.DS_Store
+*.tmp*

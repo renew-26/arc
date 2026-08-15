@@ -1,0 +1,28 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "arc",
+  "description": "Arc — a curated eight-skill workflow plugin for Claude Code.",
+  "owner": {
+    "name": "renew-26",
+    "email": "doyn0822@rentre.kr"
+  },
+  "plugins": [
+    {
+      "name": "arc",
+      "source": "./",
+      "description": "A curated workflow plugin for Claude Code: interview, ideate, plan, launch, persist, squad, trace, scan — eight skills and four coding principles.",
+      "author": {
+        "name": "renew-26"
+      },
+      "version": "0.1.0",
+      "category": "productivity",
+      "homepage": "https://github.com/renew-26/arc",
+      "tags": [
+        "workflow",
+        "planning",
+        "debugging",
+        "orchestration"
+      ]
+    }
+  ]
+}

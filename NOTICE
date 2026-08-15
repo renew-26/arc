@@ -1,0 +1,140 @@
+Arc
+Copyright (c) 2026 renew-26
+
+This product includes work derived from three upstream projects, all MIT
+licensed. Each skill below records the upstream commit it was adapted from, so
+the derivation can be audited and re-synced later.
+
+Arc's skills are adaptations, not copies: prompts were rewritten, upstream-
+internal machinery (agent types, state paths, hook keywords) was removed, and
+behavior was retargeted at Arc's own conventions. Where a file is original to
+Arc, it is labeled as such below rather than credited to an upstream.
+
+
+================================================================================
+1. oh-my-claudecode — https://github.com/Yeachan-Heo/oh-my-claudecode
+   Commit 3e945671dcf3ed1c1bcc422862815f92c1999143 (v4.14.5)
+================================================================================
+
+Adapted into Arc:
+
+  skills/require/SKILL.md   from  skills/deep-interview/SKILL.md
+  skills/plan/SKILL.md      from  skills/plan/SKILL.md
+  skills/launch/SKILL.md    from  skills/autopilot/SKILL.md
+  skills/persist/SKILL.md   from  skills/ralph/SKILL.md
+  skills/squad/SKILL.md     from  skills/team/SKILL.md
+  CLAUDE.md                 from  templates/rules/karpathy-guidelines.md
+
+Note: Arc's specification named "karpathy-skills" as the source of the four
+coding principles. That plugin was not available; oh-my-claudecode's
+templates/rules/karpathy-guidelines.md was used instead. Both derive from
+Andrej Karpathy's published observations on LLM coding failure modes.
+
+MIT License
+
+Copyright (c) 2025 Yeachan Heo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+================================================================================
+2. superpowers — https://github.com/obra/superpowers
+   Commit b36e0829c6d0140e93cfef2ca599b1b07d4a7797 (tag v6.3.0)
+================================================================================
+
+Adapted into Arc:
+
+  skills/ideate/SKILL.md    from  skills/brainstorming/SKILL.md
+  skills/trace/SKILL.md     from  skills/systematic-debugging/SKILL.md
+
+Note: these files live in the obra/superpowers plugin repository, not in the
+obra/superpowers-marketplace index repository, which contains no skills.
+
+MIT License
+
+Copyright (c) 2025 Jesse Vincent
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+================================================================================
+3. Understand-Anything — https://github.com/Egonex-AI/Understand-Anything
+   Commit 32944829e7a63a9fa9c55d811d7f98a9530c6a6a (v2.9.4)
+================================================================================
+
+Partially adapted into Arc's skills/scan/SKILL.md:
+
+  mode `explain`    section structure adapted from
+                    understand-anything-plugin/skills/understand-explain/SKILL.md
+  mode `onboard`    section structure adapted from
+                    understand-anything-plugin/skills/understand-onboard/SKILL.md
+
+In both cases the upstream skills are readers of a knowledge-graph.json that
+Arc does not produce, so their graph-reading instructions were removed and the
+data contract was retargeted at the repository itself.
+
+NOT derived from Understand-Anything:
+
+  mode `map`        original to Arc. Understand-Anything's `understand` skill is
+                    an eight-phase pipeline over ~250 KB of .mjs/.py helpers plus
+                    language and framework reference files; none of it is used
+                    here, and `map` produces a markdown map, not a knowledge
+                    graph.
+  mode `dashboard`  contains no Understand-Anything code. It detects whether the
+                    Understand-Anything plugin is installed and directs the user
+                    to run it directly.
+
+MIT License
+
+Copyright (c) 2026 Yuxiang Lin
+Copyright (c) 2026 Infinite Universe, Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

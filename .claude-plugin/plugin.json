@@ -1,0 +1,18 @@
+{
+  "name": "arc",
+  "description": "A curated workflow plugin for Claude Code: interview, ideate, plan, launch, persist, squad, trace, scan — eight skills and four coding principles.",
+  "version": "0.1.0",
+  "author": {
+    "name": "renew-26"
+  },
+  "homepage": "https://github.com/renew-26/arc",
+  "repository": "https://github.com/renew-26/arc",
+  "license": "MIT",
+  "keywords": [
+    "workflow",
+    "planning",
+    "debugging",
+    "orchestration",
+    "codebase-understanding"
+  ]
+}
