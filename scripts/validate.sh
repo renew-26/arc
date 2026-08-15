@@ -123,6 +123,33 @@ mk 0 9; printf 'updated_at=%s\n' "$(( $(date +%s) - 25200 ))" >> "$T/.arc/state/
 [ "$(run delta)" = "0" ] && pass "stop: stale state (>6h) -> exit 0" || fail "stop: staleness guard"
 rm -rf "$T"
 
+# --- 6b. dashboard template ------------------------------------------------
+# The template is shipped code, not prose, and it is the one file that renders in a
+# browser -- so it must stay self-contained. A page that reaches the network would leak
+# whatever repository it was generated from.
+head2 "6b. Dashboard template"
+TPL=skills/scan/dashboard.template.html
+n=$(grep -c '/\*__ARC_MAP_JSON__\*/' "$TPL" 2>/dev/null)
+[ "$n" = "1" ] && pass "exactly one payload placeholder" || fail "$n payload placeholders (want exactly 1)"
+if hits="$(grep -nE 'src="https?:|href="https?:|@import|fetch\(|XMLHttpRequest|WebSocket' "$TPL" 2>/dev/null)"; then
+  fail "template makes external requests:"; printf '%s\n' "$hits"
+else
+  pass "no external requests (offline-safe)"
+fi
+# Render it with a minimal payload and confirm the result is still valid HTML+JSON.
+python3 - <<'PY' && pass "renders with a sample payload" || fail "render smoke test"
+import json, re, sys
+tpl = open("skills/scan/dashboard.template.html").read()
+sample = json.dumps({"project": {"name": "t", "languages": ["Bash"], "fileCount": 1},
+                     "modules": [{"path": "x/", "role": "r"}], "risks": [],
+                     "entryPoints": [], "dependencies": [], "notExamined": ["y"]})
+out = tpl.replace("/*__ARC_MAP_JSON__*/", sample)
+blob = re.search(r'<script id="arc-data" type="application/json">(.*?)</script>', out, re.S).group(1)
+json.loads(blob)
+assert "__ARC_MAP_JSON__" not in out, "placeholder survived substitution"
+sys.exit(0)
+PY
+
 # --- 7. README -------------------------------------------------------------
 head2 "7. README"
 for s in $SKILLS; do

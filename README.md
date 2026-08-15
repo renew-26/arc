@@ -10,6 +10,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-D97757?style=flat-square&logo=anthropic&logoColor=white)](https://claude.com/claude-code)
 [![Version](https://img.shields.io/github/v/tag/renew-26/arc?style=flat-square&label=version&color=black)](https://github.com/renew-26/arc/tags)
 [![Skills](https://img.shields.io/badge/skills-8-black?style=flat-square)](#the-skills)
+[![Dependencies](https://img.shields.io/badge/dependencies-none-black?style=flat-square)](#requirements)
 [![Always-on cost](https://img.shields.io/badge/always--on-~367_tok-black?style=flat-square)](#token-cost)
 [![Stars](https://img.shields.io/github/stars/renew-26/arc?style=flat-square&color=black)](https://github.com/renew-26/arc/stargazers)
 
@@ -206,8 +207,9 @@ propose a fix it can't point at with file and line.
 
 </td><td valign="top">
 
-Four modes — `map` (structure map), `explain` (deep dive on one thing), `onboard` (guide
-for someone joining), `dashboard` (hands off to Understand-Anything).
+Four modes — `map` (structure map + `map.json`), `explain` (deep dive on one thing),
+`onboard` (guide for someone joining), `dashboard` (**a self-contained HTML page** you can
+open, commit, or attach — no server, no network, no other plugin).
 
 </td><td valign="top">
 
@@ -290,6 +292,31 @@ gets verified against real command output. When you want out:
 
 Produces the guide you wish existed on your first day: what the project does, how to run
 it, how the pieces fit, the conventions nobody wrote down, and a sensible first task.
+
+</details>
+
+<details>
+<summary><b>📊 Seeing the shape of it</b></summary>
+
+<br>
+
+```
+/arc:scan map
+/arc:scan dashboard
+```
+
+`map` writes both a readable `.arc/map.md` and a structured `.arc/map.json`. `dashboard`
+turns that JSON into `.arc/dashboard.html` — overview stats, module cards you can expand,
+risk hotspots ranked by severity with the `file:line` that proves each one, and an explicit
+list of what the scan **didn't** read.
+
+It's a plain file with no external requests. Open it, commit it, or email it to someone who
+has never heard of Claude Code.
+
+```bash
+open .arc/dashboard.html        # macOS
+xdg-open .arc/dashboard.html    # Linux
+```
 
 </details>
 
@@ -379,11 +406,13 @@ The `map` mode is **original to Arc**. Understand-Anything's real analyzer is an
 eight-phase pipeline over roughly 250 KB of helper scripts; that isn't portable into a
 prompt-only plugin, so `map` produces a markdown map rather than a knowledge graph.
 
-The `dashboard` mode contains **no upstream code at all** — it detects whether
-Understand-Anything is installed and points you at it.
+The `dashboard` mode is **original to Arc**. It renders Arc's own `.arc/map.json` into a
+self-contained HTML file — no upstream code, and no other plugin required. Versions before
+0.2.0 pointed at Understand-Anything's dashboard instead; that deferral is gone.
 
-If you want the actual knowledge graph and its interactive dashboard, install the real
-thing. Arc's `scan dashboard` will tell you how.
+**Arc requires no other plugin for anything.** If you want a real knowledge graph with
+import-level relationships, Understand-Anything does that far better than a prompt plugin
+can — but Arc never asks you to install it.
 
 **One substitution worth flagging.** Arc's spec named a `karpathy-skills` plugin as the
 source of the four principles. That plugin wasn't available, so oh-my-claudecode's

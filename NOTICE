@@ -102,8 +102,9 @@ Partially adapted into Arc's skills/scan/SKILL.md:
                     understand-anything-plugin/skills/understand-onboard/SKILL.md
 
 In both cases the upstream skills are readers of a knowledge-graph.json that
-Arc does not produce, so their graph-reading instructions were removed and the
-data contract was retargeted at the repository itself.
+Arc does not produce, so their graph-reading instructions were removed entirely
+and the data contract was retargeted at the repository itself. Arc does not
+require the Understand-Anything plugin for any mode.
 
 NOT derived from Understand-Anything:
 
@@ -112,9 +113,10 @@ NOT derived from Understand-Anything:
                     language and framework reference files; none of it is used
                     here, and `map` produces a markdown map, not a knowledge
                     graph.
-  mode `dashboard`  contains no Understand-Anything code. It detects whether the
-                    Understand-Anything plugin is installed and directs the user
-                    to run it directly.
+  mode `dashboard`  original to Arc as of 0.2.0. It renders Arc's own map.json
+                    into a self-contained local HTML file. Earlier versions
+                    deferred to the Understand-Anything plugin; that deferral has
+                    been removed and no Understand-Anything code was ever used.
 
 MIT License
 

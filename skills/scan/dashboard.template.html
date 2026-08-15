@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arc — codebase map</title>
+<style>
+  :root {
+    --bg: #fbfbfa;      --panel: #ffffff;   --ink: #1a1a19;
+    --muted: #6b6b66;   --line: #e4e4e0;    --accent: #c4553d;
+    --risk-hi: #c4553d; --risk-md: #b8860b; --risk-lo: #6b7f6b;
+    --chip: #f2f2ef;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17171a;    --panel: #1f1f23;   --ink: #ececea;
+      --muted: #92928c; --line: #33333a;    --accent: #e08a72;
+      --risk-hi: #e08a72; --risk-md: #d9b45e; --risk-lo: #8fa88f;
+      --chip: #2a2a30;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17171a;      --panel: #1f1f23;   --ink: #ececea;
+    --muted: #92928c;   --line: #33333a;    --accent: #e08a72;
+    --risk-hi: #e08a72; --risk-md: #d9b45e; --risk-lo: #8fa88f;
+    --chip: #2a2a30;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.6 ui-sans-serif, -apple-system, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  header { border-bottom: 1px solid var(--line); padding-bottom: 24px; margin-bottom: 32px; }
+  h1 { margin: 0 0 6px; font-size: 30px; letter-spacing: -0.02em; font-weight: 650; }
+  .sub { color: var(--muted); margin: 0 0 16px; max-width: 62ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    background: var(--chip); border-radius: 999px; padding: 3px 11px;
+    font-size: 12.5px; color: var(--muted); white-space: nowrap;
+  }
+  .chip b { color: var(--ink); font-weight: 600; }
+
+  h2 {
+    font-size: 12px; text-transform: uppercase; letter-spacing: 0.09em;
+    color: var(--muted); font-weight: 600; margin: 40px 0 14px;
+  }
+  h2:first-of-type { margin-top: 0; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .stat .n { font-size: 24px; font-weight: 650; letter-spacing: -0.02em; }
+  .stat .l { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+  details.card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 0; overflow: hidden;
+  }
+  details.card > summary {
+    cursor: pointer; list-style: none; padding: 15px 17px;
+    display: flex; align-items: baseline; gap: 9px;
+  }
+  details.card > summary::-webkit-details-marker { display: none; }
+  details.card > summary:hover { background: var(--chip); }
+  .card .path { font-size: 13.5px; font-weight: 600; }
+  .card .role { color: var(--muted); font-size: 13px; margin-left: auto; text-align: right; }
+  .card .body { padding: 0 17px 15px; border-top: 1px solid var(--line); padding-top: 12px; }
+  .card .body p { margin: 0 0 10px; font-size: 14px; }
+  .warn { color: var(--risk-hi); font-weight: 600; font-size: 12px; }
+
+  ul.plain { list-style: none; margin: 0; padding: 0; }
+  ul.plain li {
+    padding: 11px 0; border-bottom: 1px solid var(--line);
+    display: flex; gap: 12px; align-items: baseline;
+  }
+  ul.plain li:last-child { border-bottom: 0; }
+
+  .sev {
+    flex: none; font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+    font-weight: 700; width: 52px;
+  }
+  .sev.high { color: var(--risk-hi); } .sev.medium { color: var(--risk-md); } .sev.low { color: var(--risk-lo); }
+  .loc { color: var(--accent); font-size: 12.5px; }
+  .why { color: var(--muted); font-size: 13.5px; margin-top: 3px; }
+  .grow { flex: 1; min-width: 0; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  @media (max-width: 700px) { .cols { grid-template-columns: 1fr; gap: 0; } }
+
+  .caveat {
+    background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--risk-md);
+    border-radius: 8px; padding: 14px 17px; font-size: 13.5px; color: var(--muted);
+  }
+  .caveat b { color: var(--ink); }
+  .caveat ul { margin: 8px 0 0; padding-left: 18px; }
+
+  footer {
+    margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 12.5px; display: flex; justify-content: space-between;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .empty { color: var(--muted); font-size: 13.5px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="wrap" id="root"></div>
+
+<script id="arc-data" type="application/json">
+/*__ARC_MAP_JSON__*/
+</script>
+
+<script>
+(function () {
+  var d;
+  try { d = JSON.parse(document.getElementById('arc-data').textContent); }
+  catch (e) {
+    document.getElementById('root').innerHTML =
+      '<h1>No map data</h1><p class="sub">This dashboard was written without a valid ' +
+      '<code>.arc/map.json</code> payload. Run <code>/arc:scan map</code> first.</p>';
+    return;
+  }
+
+  var esc = function (s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  };
+  var arr = function (x) { return Array.isArray(x) ? x : []; };
+  var p = d.project || {};
+  var out = [];
+
+  // ---- header ----
+  var chips = [];
+  arr(p.languages).forEach(function (l) { chips.push('<span class="chip">' + esc(l) + '</span>'); });
+  if (p.commit) chips.push('<span class="chip">commit <b>' + esc(String(p.commit).slice(0, 7)) + '</b></span>');
+  if (p.generatedAt) chips.push('<span class="chip">scanned <b>' + esc(p.generatedAt) + '</b></span>');
+
+  out.push('<header>');
+  out.push('<h1>' + esc(p.name || 'Untitled project') + '</h1>');
+  if (p.description) out.push('<p class="sub">' + esc(p.description) + '</p>');
+  if (p.root) out.push('<p class="sub mono" style="font-size:12.5px">' + esc(p.root) + '</p>');
+  if (chips.length) out.push('<div class="chips">' + chips.join('') + '</div>');
+  out.push('</header>');
+
+  // ---- stats ----
+  var stats = [
+    [p.fileCount, 'files'],
+    [p.lineCount, 'lines'],
+    [arr(d.modules).length, 'modules'],
+    [arr(d.dependencies).length, 'external deps'],
+    [arr(d.risks).length, 'risk hotspots']
+  ].filter(function (s) { return s[0] != null; });
+
+  if (stats.length) {
+    out.push('<div class="stats">');
+    stats.forEach(function (s) {
+      out.push('<div class="stat"><div class="n">' + esc(s[0]) + '</div><div class="l">' + s[1] + '</div></div>');
+    });
+    out.push('</div>');
+  }
+
+  // ---- modules ----
+  out.push('<h2>Modules</h2>');
+  var mods = arr(d.modules);
+  if (!mods.length) out.push('<p class="empty">No modules recorded.</p>');
+  else {
+    out.push('<div class="grid">');
+    mods.forEach(function (m) {
+      var risky = arr(d.risks).some(function (r) {
+        return r.path && m.path && String(r.path).indexOf(String(m.path).replace(/\/$/, '')) === 0;
+      });
+      out.push('<details class="card"><summary>');
+      out.push('<span class="path mono">' + esc(m.path || m.id) + '</span>');
+      if (risky) out.push('<span class="warn">RISK</span>');
+      var meta = [];
+      if (m.files != null) meta.push(m.files + ' files');
+      if (m.lines != null) meta.push(m.lines + ' lines');
+      out.push('<span class="role">' + esc(meta.join(' · ')) + '</span>');
+      out.push('</summary><div class="body">');
+      out.push('<p>' + esc(m.role || 'No description recorded.') + '</p>');
+      if (arr(m.tags).length) {
+        out.push('<div class="chips">' + arr(m.tags).map(function (t) {
+          return '<span class="chip">' + esc(t) + '</span>';
+        }).join('') + '</div>');
+      }
+      out.push('</div></details>');
+    });
+    out.push('</div>');
+  }
+
+  // ---- risks ----
+  out.push('<h2>Risk hotspots</h2>');
+  var risks = arr(d.risks);
+  if (!risks.length) out.push('<p class="empty">None recorded.</p>');
+  else {
+    var rank = { high: 0, medium: 1, low: 2 };
+    risks.slice().sort(function (a, b) {
+      return (rank[a.severity] == null ? 3 : rank[a.severity]) - (rank[b.severity] == null ? 3 : rank[b.severity]);
+    });
+    out.push('<ul class="plain">');
+    risks.forEach(function (r) {
+      var loc = esc(r.path || '') + (r.line ? ':' + esc(r.line) : '');
+      out.push('<li><span class="sev ' + esc(r.severity || 'low') + '">' + esc(r.severity || '—') + '</span>');
+      out.push('<span class="grow"><span>' + esc(r.title || '') + '</span> ');
+      if (loc) out.push('<span class="loc mono">' + loc + '</span>');
+      if (r.why) out.push('<div class="why">' + esc(r.why) + '</div>');
+      out.push('</span></li>');
+    });
+    out.push('</ul>');
+  }
+
+  // ---- entry points + deps ----
+  out.push('<div class="cols"><div>');
+  out.push('<h2>Entry points</h2>');
+  var eps = arr(d.entryPoints);
+  if (!eps.length) out.push('<p class="empty">None recorded.</p>');
+  else {
+    out.push('<ul class="plain">');
+    eps.forEach(function (e) {
+      out.push('<li><span class="grow"><b>' + esc(e.name || '') + '</b> ');
+      out.push('<span class="loc mono">' + esc(e.path || '') + (e.line ? ':' + esc(e.line) : '') + '</span>');
+      if (e.note) out.push('<div class="why">' + esc(e.note) + '</div>');
+      out.push('</span></li>');
+    });
+    out.push('</ul>');
+  }
+  out.push('</div><div>');
+  out.push('<h2>External dependencies</h2>');
+  var deps = arr(d.dependencies);
+  if (!deps.length) out.push('<p class="empty">None found — this project has no external dependencies.</p>');
+  else {
+    out.push('<ul class="plain">');
+    deps.forEach(function (x) {
+      out.push('<li><span class="grow"><b>' + esc(x.name || '') + '</b>');
+      if (x.kind) out.push(' <span class="chip">' + esc(x.kind) + '</span>');
+      if (x.evidence) out.push('<div class="why mono">' + esc(x.evidence) + '</div>');
+      out.push('</span></li>');
+    });
+    out.push('</ul>');
+  }
+  out.push('</div></div>');
+
+  // ---- not examined ----
+  var ne = arr(d.notExamined);
+  if (ne.length) {
+    out.push('<h2>Not examined</h2>');
+    out.push('<div class="caveat"><b>This map is partial.</b> The following were not read, ' +
+             'so nothing above should be taken as a claim about them:<ul>');
+    ne.forEach(function (n) { out.push('<li>' + esc(n) + '</li>'); });
+    out.push('</ul></div>');
+  }
+
+  out.push('<footer><span>Generated by <b>/arc:scan dashboard</b></span>' +
+           '<span>Every claim traces to a file and line. Read the source before trusting it.</span></footer>');
+
+  document.getElementById('root').innerHTML = out.join('');
+})();
+</script>
+</body>
+</html>
