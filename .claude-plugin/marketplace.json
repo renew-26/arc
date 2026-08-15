@@ -3,7 +3,7 @@
   "name": "arc",
   "description": "Arc — a curated eight-skill workflow plugin for Claude Code.",
   "owner": {
-    "name": "renew-26",
+    "name": "hyun",
     "email": "doyn0822@rentre.kr"
   },
   "plugins": [
@@ -12,7 +12,7 @@
       "source": "./",
       "description": "A curated workflow plugin for Claude Code: interview, ideate, plan, launch, persist, squad, trace, scan — eight skills and four coding principles.",
       "author": {
-        "name": "renew-26"
+        "name": "hyun"
       },
       "version": "0.1.0",
       "category": "productivity",
