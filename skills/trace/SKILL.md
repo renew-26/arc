@@ -57,8 +57,12 @@ Phase 4 produces a confirmed cause.
    evidence anchors.
 3. **Reproduce it.** Write down the exact steps. Does it fail every time, or intermittently?
    If you cannot reproduce it, gather more data before theorizing -- do not guess.
-4. **Check what changed.** Recent commits, dependency bumps, config edits, environment
-   differences between where it works and where it does not.
+4. **Check what changed.** Recent commits, dependency bumps, config edits.
+5. **Interrogate the platform.** Does it reproduce on another OS, another shell, another
+   version of the tool being invoked? **If the report names a platform, that is evidence,
+   not background.** "Only on macOS", "only in CI", "only on Node 20" is often the whole
+   answer — the same command name can be a different program (BSD vs GNU `sed`, `date`,
+   `grep`), and a version bump can change a default.
 
 Do not proceed until you can state, in writing: the exact symptom, the exact trigger, and
 the boundary between what works and what does not.
@@ -77,6 +81,11 @@ wrong mental model of a dependency).
 
 Decide what observation would *distinguish* each hypothesis from the others, then go get it.
 
+- **If the suspect logic is a single expression or command, run it in isolation first.**
+  Feed it a minimal input in a scratch directory and watch what it actually does. Executing
+  the fragment is usually cheaper than reading more code around it, and it collapses whole
+  families of hypotheses at once. Not every bug is spread across modules — when it is one
+  line, the bullets below are the wrong tool and you should skip them.
 - When evidence for different hypotheses lives in different parts of the codebase,
   dispatch one `Task(subagent_type="Explore")` per hypothesis **in a single message** so
   they run concurrently. Brief each with its specific hypothesis and the exact question it
@@ -100,6 +109,12 @@ Decide what observation would *distinguish* each hypothesis from the others, the
    Change one variable. Do not run three probes and lose track of which mattered.
 4. Repeat 1-3 until one mechanism explains every observed detail. If nothing survives, you
    are missing evidence -- return to Phase 2 with what you learned.
+
+**Stopping here is a valid outcome.** If the user asked you to *find* the cause — an
+investigation, a post-mortem, a diagnosis on someone else's code, or a fix they want to
+write themselves — Phase 4 is the finish line. Report the mechanism, the evidence, and the
+eliminated rivals, then stop. Do not apply a fix that was not asked for. Skip Phase 5 and
+the last three verification boxes; the rest of the checklist still applies.
 
 ### Phase 5 -- Prove it, then fix it
 
@@ -126,13 +141,15 @@ Decide what observation would *distinguish* each hypothesis from the others, the
 
 ## Verification
 
-You are done when all of these hold:
+You are done when all of these hold. *(On an investigation-only run that stops at Phase 4,
+the last three boxes do not apply.)*
 
 - [ ] The root cause is stated as a **specific mechanism** -- what happens, where, and why it
       produces this symptom. "Something in the auth layer" fails this check; "`refreshToken`
       writes the new expiry to the old session object, which is discarded on line 88" passes.
 - [ ] Every claim in that statement is backed by evidence with `file:line` references, and
-      each cited path exists.
+      each cited path **and line number** is real and says what you claim it says. Open the
+      lines you inherited from a subagent before repeating them.
 - [ ] The rejected hypotheses are named, each with the evidence that eliminated it.
 - [ ] A reproduction exists -- a test or script that **fails before the fix and passes after**,
       and you have run it in both states.

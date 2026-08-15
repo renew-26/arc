@@ -17,7 +17,23 @@ Read a codebase and explain it back in plain language. Four modes, one entry poi
 | `onboard` | A guide for someone joining the project |
 | `dashboard` | Pointer to the Understand-Anything plugin, which renders graphs |
 
-If no mode is given, run `map`.
+If no mode is given, run `map`. If the argument is a path rather than a mode name, run
+`explain` on that path.
+
+**Resolve the target before anything else.** Every mode below operates on a *scan root*:
+the path given as an argument, otherwise the current working directory. Establish it once
+and state it out loud, because it is not always the repository root:
+
+```bash
+SCAN_ROOT="${1:-$PWD}"
+git -C "$SCAN_ROOT" rev-parse --show-toplevel 2>/dev/null   # empty = not a git repo
+```
+
+If the scan root is a subdirectory of a larger repository (a package, a plugin directory, a
+monorepo member), say so, and scope your reading to the scan root — but read framing files
+like the README from wherever they actually live, noting when they describe the parent
+rather than your target. Output always goes to `$SCAN_ROOT/.arc/`, created with
+`mkdir -p "$SCAN_ROOT/.arc"`.
 
 ## Use When
 
@@ -53,16 +69,27 @@ Uses only built-in tools: Glob, Grep, Read, and `git`. No external dependency, n
    does a request or a job enter, what transforms it, where does it land.
 6. **List external dependencies and integration points.** Databases, queues, third-party
    APIs, environment variables, secrets. Grep for client construction and env reads.
-7. **Mark the risky parts.** Longest files, deepest nesting, code with the most churn in
-   `git log`, anything touching auth, money, migrations, or concurrency.
-8. **Write `.arc/map.md`** with one section per item above. Every claim carries a
-   `file:line` or file path. State what you did not examine.
+7. **Mark the risky parts.** Longest files (`wc -l`), anything touching auth, money,
+   migrations, or concurrency, and — where history is available — the code with the most
+   churn. Churn needs real history, so check first:
+   ```bash
+   git -C "$SCAN_ROOT" rev-list --count HEAD 2>/dev/null
+   git -C "$SCAN_ROOT" rev-parse --is-shallow-repository 2>/dev/null
+   ```
+   A shallow clone, a fresh repository, or a non-git directory has no churn signal. Say so
+   in the output rather than silently dropping the criterion or inventing a ranking.
+8. **Write `$SCAN_ROOT/.arc/map.md`** (`mkdir -p` first) with one section per item above.
+   Overwrite any existing map — it is a regenerable artifact, not a document to merge —
+   but mention that you replaced it. Every claim carries a `file:line` or file path. State
+   what you did not examine.
 
 **Read selectively.** Sample representative files -- the largest module, one typical
 handler, one typical test -- and grep for patterns across the rest. Never dump the whole
 tree into context. For a large repository, dispatch several
 `Task(subagent_type="Explore")` subagents in one message, one per top-level area, and
-assemble their reports.
+assemble their reports. **Spot-check what they hand back** — a `file:line` you inherited
+from a subagent is a claim, not a fact. Open a sample of the cited lines and confirm they
+say what the report says before the citation reaches your output.
 
 ### Mode `explain` -- deep dive on one component
 
@@ -102,10 +129,13 @@ Target comes from the argument: a file path, or `path/to/file.ts:functionName`.
 
 Arc does not build a knowledge graph, so it cannot render one. Do not attempt to.
 
-Resolve the data directory, then branch:
+Resolve the data directory and test for a graph in one command — each Bash call is a fresh
+shell, so compute `UA_DIR` inline rather than relying on a variable set earlier:
 
 ```bash
-UA_DIR=$([ -d .understand-anything ] && echo .understand-anything || echo .ua)
+UA_DIR=$([ -d "$SCAN_ROOT/.understand-anything" ] && echo .understand-anything || echo .ua); \
+  ls "$SCAN_ROOT/$UA_DIR/knowledge-graph.json" 2>/dev/null
+ls -d ~/.claude/plugins/cache/*/understand-anything/*/ 2>/dev/null   # is the plugin installed?
 ```
 
 - **Understand-Anything installed and `$UA_DIR/knowledge-graph.json` exists** → tell the user
@@ -122,9 +152,16 @@ UA_DIR=$([ -d .understand-anything ] && echo .understand-anything || echo .ua)
 These modes work directly from the repository. If an Understand-Anything graph happens to be
 present, use it as a supplement -- never as a requirement.
 
-Run the `UA_DIR` command above. If `$UA_DIR/knowledge-graph.json` exists, grep it for the
-names you care about and fold any summaries into your own reading. If it does not exist,
-say nothing about it and carry on from source.
+Check for a graph in one self-contained command — **each Bash call is a fresh shell, so
+`UA_DIR` never survives between calls; recompute it inline every time:**
+
+```bash
+UA_DIR=$([ -d "$SCAN_ROOT/.understand-anything" ] && echo .understand-anything || echo .ua); \
+  ls "$SCAN_ROOT/$UA_DIR/knowledge-graph.json" 2>/dev/null
+```
+
+If that prints a path, grep the file for the names you care about and fold any summaries
+into your own reading. If it prints nothing, say nothing about it and carry on from source.
 
 **Read efficiently, always.** Grep before you read. Never dump a whole graph file, or a
 whole large source file, into context. Read the sections you need.
